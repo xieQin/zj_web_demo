@@ -13,6 +13,6 @@ class IndexAction extends BaseAction {
     }
 
     function test() {
-    	echo "test woking..."
+    	echo "test woking...";
     }
 }
