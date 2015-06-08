@@ -6,16 +6,35 @@
  */
 
 abstract class BBaseFacade {
-    protected static $act;
-    protected static $url;
 
-    const key = "w72v+J)K";
+	protected static $act;
+    protected static $url;
+    protected static $ss;
+    protected static $uid;
+
+    const key = "JiwLYG=-";
 
     abstract static function share($act);
 
     abstract function getToken();
 
     abstract function cacheTimeLength();
+
+    /**
+     * 返回ApiHeaderPara
+     * @return string
+     */
+    private function getApiHeaderPara() {
+        $cd = new ApiHeaderPara();
+        $cd->token = $this->getToken();
+        $cd->act = self::$act;
+        $cd->os = CommHelper::determineplatform($_SERVER['HTTP_USER_AGENT']);
+        $cd->dv = CommHelper::determineplatform($_SERVER['HTTP_USER_AGENT']);
+        $cd->dt = CommHelper::determinebrowser($_SERVER['HTTP_USER_AGENT']);
+        $cd->ss = self::$ss;
+        $cd->uid = self::$uid;
+        return "h=" . MyDes::share()->encode(json_encode($cd), self::key);
+    }
 
     /**
      * 返回PrivatePara
@@ -35,31 +54,31 @@ abstract class BBaseFacade {
      * 封装curl的调用接口，post的请求方式
      * @return array()
      */
-    protected function doCurlPostRequest($privatePara, $isDES, $timeout = 15, $isCache = true, $url = "") {
+    protected function doCurlPostRequest($privatePara, $isDES, $timeout = 15, $url = "", $isCache = true) {
 
-        $url = self::$url . self::$act;
-        $act = self::$act;
-        $requestString = $privatePara;
+        $url = self::$url;
+        $requestString = $this->getApiHeaderPara();
+        $requestString = $requestString . $privatePara;
 
-        if ($url == "" || $timeout <= 0) {
+        if ($url == "" || $requestString == "" || $timeout <= 0) {
             return false;
         }
 
-        // $isCache = $isCache && $this->cacheTimeLength() > 0;
-        // if ($isCache) {
-        //     $mc = MC();
-        //     $mk_d = self::$act . "_" . md5($privatePara);
-        //     $mk_t = $mk_d . "_lasttime2";
+        $isCache = $isCache && $this->cacheTimeLength() > 0;
+        if ($isCache) {
+            $mc = MC();
+            $mk_d = self::$act . "_" . md5($privatePara);
+            $mk_t = $mk_d . "_lasttime2";
 
-        //     if ($mc->get($mk_t)) {
-        //         $data = $mc->get($mk_d);
-        //         if ($data) {
-        //             return $data;
-        //         }
-        //     } else {
-        //         $mc->set2($mk_t, "1", $this->cacheTimeLength());
-        //     }
-        // }
+            if ($mc->get($mk_t)) {
+                $data = $mc->get($mk_d);
+                if ($data) {
+                    return $data;
+                }
+            } else {
+                $mc->set2($mk_t, "1", $this->cacheTimeLength());
+            }
+        }
 
         $data = $this->post($url, $requestString);
 
@@ -67,10 +86,10 @@ abstract class BBaseFacade {
             $data = MyDes::share()->decode($data, self::key);
         }
 
-        // if ($isCache) {
-        //     //数据最长保存一小时（实际缓存时间为$mk_t的缓存时间）
-        //     $mc->set($mk_d, $data, 60 * 60);
-        // }
+        if ($isCache) {
+            //数据最长保存一小时（实际缓存时间为$mk_t的缓存时间）
+            $mc->set($mk_d, $data, 60 * 60);
+        }
 
         return $data;
     }
@@ -82,13 +101,11 @@ abstract class BBaseFacade {
         curl_setopt($con, CURLOPT_POST, true);
         curl_setopt($con, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($con, CURLOPT_TIMEOUT, (int) $timeout);
-        curl_setopt($con, CURLOPT_SSL_VERIFYHOST, true); 
-        curl_setopt($con, CURLOPT_SSL_VERIFYPEER, false);
         $data = curl_exec($con);
         $httpCode = curl_getinfo($con, CURLINFO_HTTP_CODE);
         curl_close($con);
         if ($httpCode == 200) {
-             return $data;
+            return $data;
         } else {
             return false;
         }
