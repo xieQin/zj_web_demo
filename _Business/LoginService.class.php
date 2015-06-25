@@ -53,7 +53,7 @@ class LoginService {
     static function checkLoginValid() {
         $user = self::getLoginUser();
         if($user == null) {
-            echo "please login in..."
+            echo "please login in...";
             exit;
         }
         else {
