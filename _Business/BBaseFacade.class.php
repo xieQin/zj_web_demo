@@ -11,12 +11,11 @@ abstract class BBaseFacade {
     protected static $url;
     protected static $ss;
     protected static $uid;
+    protected static $key;
+    protected static $token;
 
-    const key = "JiwLYG=-";
+    abstract static function share($name, $act);
 
-    abstract static function share($act);
-
-    abstract function getToken();
 
     abstract function cacheTimeLength();
 
@@ -26,14 +25,14 @@ abstract class BBaseFacade {
      */
     private function getApiHeaderPara() {
         $cd = new ApiHeaderPara();
-        $cd->token = $this->getToken();
+        $cd->token = self::$token;
         $cd->act = self::$act;
         $cd->os = CommHelper::determineplatform($_SERVER['HTTP_USER_AGENT']);
         $cd->dv = CommHelper::determineplatform($_SERVER['HTTP_USER_AGENT']);
         $cd->dt = CommHelper::determinebrowser($_SERVER['HTTP_USER_AGENT']);
         $cd->ss = self::$ss;
         $cd->uid = self::$uid;
-        return "h=" . MyDes::share()->encode(json_encode($cd), self::key);
+        return "h=" . MyDes::share()->encode(json_encode($cd), self::$key);
     }
 
     /**
@@ -43,7 +42,7 @@ abstract class BBaseFacade {
     public function getPrivatePara($privateParaClass) {
 
         if($privateParaClass) {
-            return "&p=" . MyDes::share()->encode(json_encode($privateParaClass), self::key);
+            return "&p=" . MyDes::share()->encode(json_encode($privateParaClass),  self::$key);
         }
         else {
             return null;
@@ -83,7 +82,7 @@ abstract class BBaseFacade {
         $data = $this->post($url, $requestString);
 
         if ($isDES) {
-            $data = MyDes::share()->decode($data, self::key);
+            $data = MyDes::share()->decode($data,  self::$key);
         }
 
         if ($isCache) {
