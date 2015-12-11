@@ -7,5 +7,5 @@ return array(
 		"DES_KEY" => "JiwLYG=-",
 		"token" => "deaec42f0300cc5a95986996104e3d14",
 		"SAF_KEY" => "",
-	),
+	), //demo api  测试用 可无视
 );

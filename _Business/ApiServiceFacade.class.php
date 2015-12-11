@@ -12,11 +12,12 @@ class ApiServiceFacade extends BBaseFacade {
      */
     static function share($apiname, $act) {
         static $ins = null;
+        $config = getC($apiname);
         self::$act = $act;
-        self::$key = getC($apiname)['DES_KEY'];
-        self::$token = getC($apiname)["token"];
+        self::$key = @$config['DES_KEY'];
+        self::$token = @$config["token"];
         if (!$ins) {
-            self::$url = getC($apiname)['url'];
+            self::$url = @$config['url'];
             $ins = new ApiServiceFacade();
         }
         return $ins;

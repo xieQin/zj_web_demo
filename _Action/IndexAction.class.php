@@ -12,16 +12,20 @@ class IndexAction extends BaseAction {
 
     }
 
+    function index() {
+        renderView('index', 'index');
+    }
+
     function test() {
     	echo "test woking...";
     }
 
     function testApi() {
-    	$res = DemoApiCenterFacade::getApi('DemoApi', 'NOWFirstPageImagesQuery', [
+    	$res = DemoApiCenterFacade::getApi('DemoApi', 'NOWFirstPageImagesQuery', array(
     		'Page' => 1,
     		'PageSize' => '5',
     		'NOWFirstPageImagesID' => null
-    	]);
+    	));
 
     	renderJson($res);
     }
