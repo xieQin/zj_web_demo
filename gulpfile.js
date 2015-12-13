@@ -23,8 +23,8 @@ var gulp    = require('gulp'),                 //基础库
 
 // HTML处理
 gulp.task('html', function() {
-    var htmlSrc = './src/*.html',
-        htmlDst = './public/';
+    var htmlSrc = './src/**/*.html.php',
+        htmlDst = './';
 
     return gulp.src(htmlSrc)
         .pipe(changed(htmlDst))
@@ -32,8 +32,8 @@ gulp.task('html', function() {
 });
 
 gulp.task('g-html', function() {
-    var htmlSrc = './public/*.html',
-        htmlDst = './build/';
+    var htmlSrc = './_Tpl/**/*.html.php',
+        htmlDst = './build/_Tpl';
 
     return gulp.src(htmlSrc)
         .pipe(changed(htmlDst))
@@ -142,16 +142,16 @@ gulp.task('vendor', function() {
 //md5文件名替换
 gulp.task('rev-html', function() {
 
-    return gulp.src(['./rev/**/*.json', './build/*.html'])    //- 读取 rev-manifest.json 文件以及需要进行替换的文件
+    return gulp.src(['./rev/**/*.json', './_Tpl/**/*.html.php'])    //- 读取 rev-manifest.json 文件以及需要进行替换的文件
         .pipe(revCollector({                                //- 执行文件内的替换
             replaceReved: true
         }))
-        .pipe(gulp.dest('./build'));                         //- 替换后的文件输出的目录
+        .pipe(gulp.dest('./build/_Tpl'));                         //- 替换后的文件输出的目录
 });
 
 gulp.task('rev-css', function() {
 
-    return gulp.src(['./rev/images/*.json', './build/css/*.*'])    //- 读取 rev-manifest.json 文件以及需要进行替换的文件
+    return gulp.src(['./rev/images/*.json', './public/css/*.*'])    //- 读取 rev-manifest.json 文件以及需要进行替换的文件
         .pipe(revCollector({                                //- 执行文件内的替换
             replaceReved: true
         }))
@@ -194,7 +194,7 @@ gulp.task('watch',function(){
 
     // livereload.listen();
 
-    gulp.watch('src/*.html', ['html']);
+    gulp.watch('src/**/*.html.php', ['html']);
 
     gulp.watch('src/js/**/*.js', ['js']);
 
